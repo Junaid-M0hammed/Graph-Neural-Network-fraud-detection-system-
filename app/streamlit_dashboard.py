@@ -269,14 +269,19 @@ st.markdown("""
 
 @st.cache_data
 def load_sample_data():
-    """Load and cache sample transaction data"""
+    """Load and cache transaction data (generates sample data if real data unavailable)"""
     try:
         loader = IEEE_CIS_DataLoader("./data/")
         data = loader.load_and_preprocess()
+        
+        # Check if we're using sample data by looking at data size
+        if 'full_data' in data and len(data['full_data']) == 10000:
+            st.info("📊 Using sample dataset for demonstration. The dashboard shows all features with synthetic fraud detection data.")
+        
         return data
     except Exception as e:
-        st.error(f"Error loading data: {e}")
-        # Create synthetic sample data for demo
+        st.error(f"Error in data processing: {e}")
+        # Fallback synthetic data for demo
         np.random.seed(42)
         n_samples = 10000
         sample_data = pd.DataFrame({
@@ -288,6 +293,7 @@ def load_sample_data():
             'isFraud': np.random.choice([0, 1], n_samples, p=[0.965, 0.035]),
             'TransactionDT': np.random.randint(0, 15000000, n_samples)
         })
+        st.info("📊 Using fallback sample dataset for demonstration.")
         return {'full_data': sample_data}
 
 @st.cache_data

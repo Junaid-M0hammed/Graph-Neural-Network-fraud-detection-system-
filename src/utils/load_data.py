@@ -46,7 +46,8 @@ class IEEE_CIS_DataLoader:
         
     def load_raw_data(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
-        Load raw transaction and identity data from CSV files
+        Load raw transaction and identity data from CSV files.
+        If files don't exist, automatically generate sample data.
         
         Returns:
             Tuple of (transaction_df, identity_df)
@@ -57,10 +58,10 @@ class IEEE_CIS_DataLoader:
         train_transaction_path = os.path.join(self.data_path, "train_transaction.csv")
         train_identity_path = os.path.join(self.data_path, "train_identity.csv")
         
-        if not os.path.exists(train_transaction_path):
-            raise FileNotFoundError(f"Transaction file not found: {train_transaction_path}")
-        if not os.path.exists(train_identity_path):
-            raise FileNotFoundError(f"Identity file not found: {train_identity_path}")
+        # Check if data files exist, create sample data if not
+        if not os.path.exists(train_transaction_path) or not os.path.exists(train_identity_path):
+            logger.warning("Data files not found. Generating sample data for demonstration...")
+            create_sample_data(self.data_path)
             
         transaction_df = pd.read_csv(train_transaction_path)
         identity_df = pd.read_csv(train_identity_path)
