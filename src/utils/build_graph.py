@@ -360,11 +360,30 @@ class FraudGraphBuilder:
         # Create node features
         node_features = self.create_node_features(entities)
         
-        # Concatenate all node features
+        # Concatenate all node features (pad to same dimension for homogeneous graph)
         all_node_features = []
+        max_features = 0
+        
+        # Find maximum feature dimension
         for entity_type in self.node_types:
             if entity_type in node_features:
-                all_node_features.append(node_features[entity_type])
+                max_features = max(max_features, node_features[entity_type].shape[1])
+        
+        logger.info(f"Maximum feature dimension for homogeneous graph: {max_features}")
+        
+        # Pad all tensors to the same dimension
+        for entity_type in self.node_types:
+            if entity_type in node_features:
+                features = node_features[entity_type]
+                current_dim = features.shape[1]
+                
+                if current_dim < max_features:
+                    # Pad with zeros to match max dimension
+                    padding = torch.zeros(features.shape[0], max_features - current_dim)
+                    features = torch.cat([features, padding], dim=1)
+                    logger.info(f"Padded {entity_type} features from {current_dim} to {max_features} dimensions")
+                
+                all_node_features.append(features)
         
         if all_node_features:
             x = torch.cat(all_node_features, dim=0)
