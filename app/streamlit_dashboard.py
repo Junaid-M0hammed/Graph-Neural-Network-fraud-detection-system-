@@ -276,7 +276,7 @@ def load_sample_data():
         
         # Check if we're using sample data by looking at data size
         if 'full_data' in data and len(data['full_data']) == 10000:
-            st.info("📊 Using sample dataset for demonstration. The dashboard shows all features with synthetic fraud detection data.")
+            pass  # Removed sample dataset notification
         
         return data
     except Exception as e:
