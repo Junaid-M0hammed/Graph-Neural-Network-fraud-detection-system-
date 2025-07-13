@@ -1,4 +1,4 @@
-# GNN-Based Fraud Detection in FinTech
+# 🛡️ FraudFlow AI - Intelligent Fraud Detection for FinTech
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.1+-red.svg)](https://pytorch.org)
@@ -20,6 +20,10 @@ This project implements a production-ready **Graph Neural Network (GNN)** system
 - **Production Ready**: Modular design, comprehensive logging, and model checkpointing
 - **Optional Deployment**: FastAPI REST endpoints for real-time fraud scoring
 
+<img width="1066" height="287" alt="image" src="https://github.com/user-attachments/assets/e409d6bb-0286-49a9-9c88-743c9cbe9b02" />
+
+<img width="1327" height="642" alt="image" src="https://github.com/user-attachments/assets/d31f682c-751b-48ca-be94-69d316d89eb8" />
+
 ## Architecture
 
 ```
@@ -34,7 +38,7 @@ This project implements a production-ready **Graph Neural Network (GNN)** system
 └─────────────────┘    └──────────────────┘    └─────────────────┘
 ```
 
-### 🧩 Graph Construction Strategy
+###  Graph Construction Strategy
 
 Our approach converts tabular transaction data into a rich graph structure:
 
@@ -109,116 +113,7 @@ Our Streamlit dashboard provides a comprehensive view of the fraud detection sys
 - **Rolling Metrics**: Dynamic fraud rate tracking
 - **Transaction Timeline**: Historical view of recent activity
 
-## Setup & Installation
-
-### Prerequisites
-
-- Python 3.10+
-- CUDA 11.8+ (optional, for GPU acceleration)
-- 8GB+ RAM (16GB recommended for large datasets)
-
-### 1. Clone Repository
-
-```bash
-git clone https://github.com/your-username/gnn-fraud-detection-fintech.git
-cd gnn-fraud-detection-fintech
-```
-
-### 2. Install Dependencies
-
-```bash
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install PyTorch (choose appropriate version for your system)
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-
-# Install PyTorch Geometric
-pip install torch-geometric
-
-# Install remaining dependencies
-pip install -r requirements.txt
-```
-
-### 3. Download IEEE-CIS Dataset
-
-```bash
-# Option 1: Download from Kaggle (requires Kaggle API)
-kaggle competitions download -c ieee-fraud-detection
-unzip ieee-fraud-detection.zip -d data/
-
-# Option 2: Use sample data (for quick demo)
-python -c "from src.utils.load_data import create_sample_data; create_sample_data('data/', 10000)"
-```
-
-## Quick Start
-
-### Option 1: Interactive Dashboard (Recommended)
-
-```bash
-# Navigate to project root
-cd gnn-fraud-detection-fintech
-
-# Set up data (choose Kaggle download or sample data)
-python setup_data.py
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Launch interactive dashboard
-python run_dashboard.py
-```
-
-The dashboard will be available at `http://localhost:8501` with:
-- **Model Performance**: ROC/PR curves, confusion matrix, key metrics
-- **Node Embeddings**: UMAP/t-SNE visualization of fraud clusters
-- **Interactive Graphs**: PyVis network showing fraud patterns
-- **Data Distribution**: Transaction trends and feature importance
-- **Real-time Monitor**: Simulated streaming fraud detection
-
-### Option 2: Command Line Training
-
-```python
-# Run the demo notebook
-jupyter notebook notebooks/fraud_detection_demo.ipynb
-
-# Or run training script directly
-python src/train.py
-```
-
-### Basic Usage Example
-
-```python
-import torch
-from src.utils.load_data import IEEE_CIS_DataLoader
-from src.utils.build_graph import create_graph_from_data
-from src.models.gcn import create_fraud_gcn
-from src.train import FraudGCNTrainer
-
-# 1. Load and preprocess data
-loader = IEEE_CIS_DataLoader("data/")
-data = loader.load_and_preprocess()
-
-# 2. Build graph
-graph = create_graph_from_data(data['full_data'])
-
-# 3. Create and train model
-model = create_fraud_gcn(
-    node_feature_dim=graph.x.shape[1],
-    edge_feature_dim=graph.edge_attr.shape[1]
-)
-
-trainer = FraudGCNTrainer(model)
-trainer.setup_training()
-trainer.train(train_data, val_data, num_epochs=50)
-
-# 4. Evaluate performance
-from src.evaluate import evaluate_fraud_model
-results = evaluate_fraud_model(model, test_data)
-```
-
-## 📊 Dataset Information
+##  Dataset Information
 
 ### IEEE-CIS Fraud Detection Dataset
 
@@ -277,76 +172,7 @@ monthly_savings = (detected_fraud * avg_amount) - (false_positives * review_cost
 - **💰 Fraud Recovery Rate**: 89% of fraud amounts recovered
 - **⚡ False Positive Rate**: <2% (industry benchmark: 5-10%)
 - **🕐 Real-time Scoring**: <100ms inference time
-- **📊 Model Confidence**: Calibrated probability scores for risk-based decisions
-
-## 🔧 Advanced Configuration
-
-### Model Hyperparameters
-
-```python
-model_config = {
-    'hidden_dims': [128, 64, 32],    # GCN layer dimensions
-    'embedding_dim': 32,             # Final node embedding size
-    'dropout': 0.2,                  # Regularization
-    'num_classes': 2,                # Binary classification
-    'task': 'edge_classification'    # Fraud detection on edges
-}
-```
-
-### Training Configuration
-
-```python
-training_config = {
-    'optimizer': 'adam',
-    'learning_rate': 0.001,
-    'weight_decay': 1e-5,
-    'scheduler': 'reduce_on_plateau',
-    'loss': 'weighted_focal',        # Handles class imbalance
-    'early_stopping_patience': 15
-}
-```
-
-## 🚀 Deployment (Optional)
-
-### FastAPI REST Service
-
-```bash
-# Start the API server
-cd app/
-uvicorn main:app --host 0.0.0.0 --port 8000
-```
-
-### API Usage
-
-```python
-import requests
-
-# Predict fraud for a transaction
-response = requests.post(
-    "http://localhost:8000/predict",
-    json={
-        "transaction_data": {
-            "TransactionAmt": 150.0,
-            "card1": 12345,
-            "addr1": 67890,
-            # ... other features
-        }
-    }
-)
-
-result = response.json()
-# {'fraud_probability': 0.85, 'prediction': 'fraud', 'confidence': 'high'}
-```
-
-### Docker Deployment
-
-```bash
-# Build container
-docker build -t fraud-detection-gnn .
-
-# Run container
-docker run -p 8000:8000 fraud-detection-gnn
-```
+- **📊 Model Confidence**: Calibrated probability scores for risk-based decisionsS
 
 ## 📚 Research & References
 
@@ -365,44 +191,20 @@ This project implements and extends several key research papers:
 - **Alibaba**: Large-scale graph learning for financial risk management
 - **Uber**: Real-time fraud detection in ride-sharing platform
 
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-### Development Setup
-
-```bash
-# Install development dependencies
-pip install -r requirements-dev.txt
-
-# Run tests
-pytest tests/
-
-# Format code
-black src/
-isort src/
-
-# Type checking
-mypy src/
-```
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **IEEE Computational Intelligence Society** for the fraud detection dataset
 - **PyTorch Geometric Team** for the excellent graph learning framework
 - **FinTech Research Community** for inspiring real-world applications
 
-## 📞 Contact & Support
 
-- **🐛 Issues**: [GitHub Issues](https://github.com/your-username/gnn-fraud-detection-fintech/issues)
-- **💬 Discussions**: [GitHub Discussions](https://github.com/your-username/gnn-fraud-detection-fintech/discussions)
-- **📧 Email**: your-email@example.com
 
----
+
 
 <div align="center">
 
